@@ -6,7 +6,7 @@ class Reader
     @tokens = tokens
     @position = 0
 
-    puts "Initialized reader with tokens: #{tokens}"
+    # puts "Initialized reader with tokens: #{tokens}"
   end
 
   def next
@@ -34,9 +34,8 @@ CHAR_CLOSE_LIST = ")"
 
 # Take string input and return tokens
 def tokenizer(str)
-  require 'byebug'
-  byebug
-  TOKENS_REGEX.match(str).to_a
+  matches = str.scan /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
+  matches.map(&:first)
 end
 
 # Return the internal data type representing a given reader
@@ -53,7 +52,7 @@ def read_list(reader)
 
   reader.next # iterate past open paren
 
-  while reader.next != CHAR_CLOSE_LIST
+  while reader.peek != CHAR_CLOSE_LIST
     list << read_form(reader)
   end
 
@@ -63,12 +62,9 @@ end
 # Given a reader representing an atom, return our
 # internal representation of that atom.
 def read_atom(reader)
-  # TODO: maybe move this list of type classes elsewhere?
-  [MalInteger, MalSymbol].each do |type_class|
-    begin
-      return type_class.new(reader.next)
-    rescue InvalidInputError
-      next
-    end
+  if !/$[0-9]+^/.match(reader.peek).nil?
+    MalInteger.new(reader.next)
+  else
+    MalSymbol.new(reader.next)
   end
 end
