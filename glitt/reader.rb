@@ -74,7 +74,7 @@ end
 # Given a reader representing an atom, return our
 # internal representation of that atom.
 def read_atom(reader)
-  if !/^[0-9]+$/.match(reader.peek).nil?
+  if !/^\-*[0-9]+$/.match(reader.peek).nil?
     Integer(reader.next)
   else
     reader.next.to_sym

@@ -7,7 +7,7 @@ def pr_str(ast)
   when Symbol
     return ast.to_s
   when Array
-    substrings = form.map { |obj| pr_str(obj) }
+    substrings = ast.map { |obj| pr_str(obj) }
     return "(#{substrings.join(' ')})"
   end
 end
