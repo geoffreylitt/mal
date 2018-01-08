@@ -18,6 +18,11 @@ class Reader
   def peek
     @tokens[@position]
   end
+
+  # Useful for debugging, see what's left in our reader
+  def remaining_tokens
+    @tokens[@position..-1]
+  end
 end
 
 # Tokenize input and convert to internal data representation
@@ -50,7 +55,8 @@ end
 def read_list(reader)
   list = []
 
-  reader.next # iterate past open paren
+  # Move past the open paren that we peeked at to get here
+  reader.next
 
   while reader.peek != CHAR_CLOSE_LIST
     if reader.peek.nil?
@@ -58,6 +64,9 @@ def read_list(reader)
     end
     list << read_form(reader)
   end
+
+  # Move past the close paren that we peeked at to end our list reading
+  reader.next
 
   list
 end

@@ -1,8 +1,7 @@
 require 'test/unit'
 require_relative 'reader'
 
-# A few basic unit tests of our Game class.
-# Not particularly exhaustive, just enough to support basic refactoring
+# Super basic unit tests for reading functionality.
 
 class TestReader < Test::Unit::TestCase
   def test_read_atom_integer
