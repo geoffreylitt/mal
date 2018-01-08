@@ -35,7 +35,7 @@ CHAR_CLOSE_LIST = ")"
 # Take string input and return tokens
 def tokenizer(str)
   matches = str.scan /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
-  matches.map(&:first)
+  matches.map(&:first).reject{ |token| token == "" }
 end
 
 # Return the internal data type representing a given reader
