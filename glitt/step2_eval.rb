@@ -16,8 +16,8 @@ class UndefinedSymbolError < StandardError; end
 # Resolve symbols in the environment, and handle list evaluation
 def eval_ast(ast, env)
   case ast
-  when MalSymbol
-    result = env[ast.symbol.to_s]
+  when Symbol
+    result = env[ast.to_s]
     raise UndefinedSymbolError if result.nil?
     result
   when Array
@@ -41,7 +41,6 @@ def EVAL(ast, env)
       # non-empty lists get interpreted as a function call
       evaluated = eval_ast(ast, env)
       function, *args = evaluated
-      byebug
       function.call(*args)
     end
   else

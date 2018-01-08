@@ -66,9 +66,9 @@ end
 # internal representation of that atom.
 def read_atom(reader)
   if !/^[0-9]+$/.match(reader.peek).nil?
-    MalInteger.new(reader.next)
+    Integer(reader.next)
   else
-    MalSymbol.new(reader.next)
+    reader.next.to_sym
   end
 end
 
