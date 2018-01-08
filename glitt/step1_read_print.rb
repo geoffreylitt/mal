@@ -26,10 +26,16 @@ PROMPT = "user> "
 # simply handles user input and output on the REPL
 def main
   while true
-    print PROMPT
-    input = gets.chomp
-    # todo: quit on CTRL+D
-    puts rep(input)
+    begin
+      print PROMPT
+      input = gets.chomp
+      # todo: quit on CTRL+D
+      output = rep(input)
+    rescue UnmatchedParensError
+      output = "Expected ')', got EOF"
+    end
+
+    puts output
   end
 end
 

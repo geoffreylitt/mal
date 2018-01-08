@@ -53,6 +53,9 @@ def read_list(reader)
   reader.next # iterate past open paren
 
   while reader.peek != CHAR_CLOSE_LIST
+    if reader.peek.nil?
+      raise UnmatchedParensError
+    end
     list << read_form(reader)
   end
 
@@ -68,3 +71,5 @@ def read_atom(reader)
     MalSymbol.new(reader.next)
   end
 end
+
+class UnmatchedParensError < StandardError; end
