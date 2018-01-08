@@ -54,7 +54,7 @@ def read_list(reader)
 
   while reader.peek != CHAR_CLOSE_LIST
     if reader.peek.nil?
-      raise UnmatchedParensError
+      raise UnmatchedParensError, "Expected ')', got EOF."
     end
     list << read_form(reader)
   end

@@ -13,12 +13,14 @@ REPL_ENV = {
 
 class UndefinedSymbolError < StandardError; end
 
-# Resolve symbols in the environment, and handle list evaluation
+# Resolve symbols in the environment, including handling lists.
+# This is a pre-stage to the actual "apply" stage; we're just
+# resolving pre-defined symbols.
 def eval_ast(ast, env)
   case ast
   when Symbol
     result = env[ast.to_s]
-    raise UndefinedSymbolError if result.nil?
+    raise UndefinedSymbolError, "'#{ast.to_s}' not found." if result.nil?
     result
   when Array
     ast.map { |element| EVAL(element, env) }
@@ -31,7 +33,10 @@ def READ(str)
   read_str(str)
 end
 
-# Given an AST, return the evaluated result
+# Given an AST, return the evaluated result.
+# This is the heart of the language!
+# It includes the "apply" phase where of actually invoking functions
+# based on the contents of the list.
 def EVAL(ast, env)
   if ast.is_a? Array
     if ast.empty?
@@ -67,11 +72,11 @@ def main
   while true
     begin
       print PROMPT
-      input = gets.chomp
-      # todo: quit on CTRL+D
+      input = gets
+      exit if input.nil?
       output = rep(input)
-    rescue UnmatchedParensError
-      output = "Expected ')', got EOF"
+    rescue UnmatchedParensError, UndefinedSymbolError => e
+      output = "Error: #{e.message}"
     end
 
     puts output
