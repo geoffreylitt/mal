@@ -8,21 +8,29 @@ class Env
     @data[key] = value
   end
 
+  # Recurse upwards through parent environments looking for given key
   def find(key)
     if @data.key?(key)
-      return @data
+      return self
     else
-      return @outer if !@outer.nil?
+      return @outer.find(key) if !@outer.nil?
     end
   end
 
+  # Resolve a key in the environment, including parent environments
   def get(key)
     env = find(key)
 
     if env.nil?
       raise UndefinedSymbolError, "'#{key.to_s}' not found."
     else
-      env[key]
+      env.simple_get(key)
     end
+  end
+
+  # Just fetch the key from the internal data hash,
+  # don't do any parent environment resolution
+  def simple_get(key)
+    @data[key]
   end
 end
