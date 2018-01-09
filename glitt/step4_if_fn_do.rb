@@ -74,10 +74,18 @@ def rep(str)
   PRINT(evaluated)
 end
 
+# Defining non-built-in functions is just a matter of executing MAL code when
+# we start our REPL.
+def define_stdlib
+  rep("(def! not (fn* (a) (if a false true)))")
+end
+
 # Our main loop;
 # simply handles user input and output on the REPL
 PROMPT = "user> "
 def main
+  define_stdlib
+
   while true
     begin
       print PROMPT

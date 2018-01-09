@@ -1,8 +1,4 @@
 # Defining our built-ins
-# (question: how would we define non-built-ins, eg standard library?
-# I guess we would have a separate initialization step where we execute
-# Ruby code on startup to define those stdlib functions?)
-
 NS = {
   :+ => lambda { |a, b| a + b },
   :- => lambda { |a, b| a - b },
