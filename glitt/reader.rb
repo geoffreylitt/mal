@@ -1,3 +1,5 @@
+require_relative "string_transforms"
+
 # A simple object handling managing state for a set of tokens
 class Reader
   def initialize(tokens)
@@ -71,9 +73,27 @@ end
 
 # Given a reader representing an atom, return our
 # internal representation of that atom.
+# We use regex matches to decide what data type to assign to the token.
+
+# TODO: figure out if there's a better way to do this than a bunch of
+# conditionals with regexes -- feels like this could get too complex with
+# many types to parse
 def read_atom(reader)
   if !/^\-*[0-9]+$/.match(reader.peek).nil?
     Integer(reader.next)
+  elsif !/^\"(.*)\"/.match(reader.peek).nil?
+    # Quotation marks get removed from the string in our parsing
+    # TODO: figure out if this is actually the right thing to do
+    string = Regexp.last_match[1]
+
+    # Convert escaped characters into their internal un-escaped representation.
+    unescape(string)
+  elsif reader.peek == "true"
+    true
+  elsif reader.peek == "false"
+    false
+  elsif reader.peek == "nil"
+    nil
   else
     reader.next.to_sym
   end
