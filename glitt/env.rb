@@ -1,7 +1,10 @@
 class Env
-  def initialize(outer)
+  def initialize(outer:, binds: [], exprs: [])
     @data = {}
     @outer = outer
+    binds.zip(exprs).each do |symbol, expr|
+      @data[symbol] = expr
+    end
   end
 
   def set(key, value)

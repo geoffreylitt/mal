@@ -8,6 +8,8 @@ def pr_str(ast, print_readably: true)
   when true     then "true"
   when false    then "false"
   when nil      then "nil"
-  when Array    then "(#{ast.map { |obj| pr_str(obj) }.join(' ')})"
+  when Array
+    "(#{ast.map { |obj| pr_str(obj, print_readably: print_readably) }.join(' ')})"
+  else               ast.to_s
   end
 end
