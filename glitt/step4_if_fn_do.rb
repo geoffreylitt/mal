@@ -45,13 +45,63 @@ def EVAL(ast, env)
       # First, handle the *Special Forms* --
 
       case ast.first
-      when :def!    then SpecialForms.def!(ast, env)
-      when :"let*"  then SpecialForms.let_star(ast, env)
-      when :do      then SpecialForms.do(ast, env)
-      when :if      then SpecialForms.if(ast, env)
-      when :or      then SpecialForms.or(ast, env)
-      when :and      then SpecialForms.and(ast, env)
-      when :"fn*"   then SpecialForms.fn_star(ast, env)
+      when :def!
+        # Define a new value in the environment
+        # Example usage of def!:
+        # (def! a 6) ;=> 6
+        env.set(ast[1], EVAL(ast[2], env))
+      when :"let*"
+        # Define a new environment and evaluate an expression in that env.
+        # Example usage of let*:
+        # (let* (a 1 b 2) a) ;=> 1
+
+        new_env = Env.new(outer: env)
+
+        # Take pairs from the let* binding list and use them to set
+        # values in our newly created environment.
+        ast[1].each_slice(2) do |pair|
+          new_env.set(pair[0], EVAL(pair[1], new_env))
+        end
+
+        # Finally, evaluate the last argument in the new env and return result
+        EVAL(ast[2], new_env)
+      when :do
+        # evaluate all the elements of the list in order, returning the last one
+        ast[1..-2].each { |element| EVAL(element, env) }
+        EVAL(ast[-1], env)
+      when :if
+        if truthy?(EVAL(ast[1], env))
+          EVAL(ast[2], env)
+        else
+          ast.length >= 3 ? EVAL(ast[3], env) : nil
+        end
+      when :or
+        if truthy?(EVAL(ast[1], env)) || truthy?(EVAL(ast[2], env))
+          true
+        else
+          false
+        end
+      when :and
+        if truthy?(EVAL(ast[1], env)) && truthy?(EVAL(ast[2], env))
+          true
+        else
+          false
+        end
+      when :"fn*"
+        # Function definition.
+        # Example usage:
+        # ( (fn* [a b] (+ a b)) 2 3 ) ;=> 5
+
+        # We take advantage of Ruby closures here;
+        # we get access to variables like env and ast inside the function
+        # we return here.
+        -> (*exprs) do
+          # Create a new environment with variables bound to the function args
+          new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
+
+          # Evaluate the function body in the context of that new environment
+          EVAL(ast[2], new_env)
+        end
       else
         # Finally, handle generic function application
         evaluated = eval_ast(ast, env)
