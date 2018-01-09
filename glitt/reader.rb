@@ -1,5 +1,3 @@
-require_relative "types"
-
 # A simple object handling managing state for a set of tokens
 class Reader
   def initialize(tokens)
