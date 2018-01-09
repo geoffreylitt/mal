@@ -36,4 +36,6 @@ class Env
   def simple_get(key)
     @data[key]
   end
+
+  attr_accessor :data # for debugging
 end

@@ -10,6 +10,9 @@ def pr_str(ast, print_readably: true)
   when nil      then "nil"
   when Array
     "(#{ast.map { |obj| pr_str(obj, print_readably: print_readably) }.join(' ')})"
+  when Proc     then "#<function>"
+  when Hash     then "#<function>" # for now hashes always represent
+                                   # user functions defined with fn*
   else               ast.to_s
   end
 end

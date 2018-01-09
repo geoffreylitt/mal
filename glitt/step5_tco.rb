@@ -15,6 +15,7 @@ def truthy?(boolean)
 end
 
 class UndefinedSymbolError < StandardError; end
+class UndefinedFunctionError < StandardError; end
 
 # Resolve symbols in the environment, including handling lists.
 # This is a pre-stage to the actual "apply" stage; we're just
@@ -38,6 +39,7 @@ end
 # This is the heart of the language!
 def EVAL(ast, env)
   loop do
+    # puts "EVAL(#{ast},#{env})"
     if ast.is_a? Array
       if ast.empty?
         # Nothing to do to evaluate an empty list
@@ -53,7 +55,7 @@ def EVAL(ast, env)
           # Define a new value in the environment
           # Example usage of def!:
           # (def! a 6) ;=> 6
-          env.set(ast[1], EVAL(ast[2], env))
+          return env.set(ast[1], EVAL(ast[2], env))
         when :"let*"
           # Define a new environment and evaluate an expression in that env.
           # Example usage of let*:
@@ -67,29 +69,30 @@ def EVAL(ast, env)
             new_env.set(pair[0], EVAL(pair[1], new_env))
           end
 
-          # Finally, evaluate the last argument in the new env and return result
-          EVAL(ast[2], new_env)
+          # Finally, evaluate the last argument in the new env
+          ast = ast[2]
+          env = new_env
         when :do
           # evaluate all the elements of the list in order, returning the last one
           ast[1..-2].each { |element| EVAL(element, env) }
-          EVAL(ast[-1], env)
+          ast = ast[-1]
         when :if
           if truthy?(EVAL(ast[1], env))
-            EVAL(ast[2], env)
+            ast = ast[2]
           else
-            ast.length >= 3 ? EVAL(ast[3], env) : nil
+            ast = ast[3] if ast.length >= 4
           end
         when :or
           if truthy?(EVAL(ast[1], env)) || truthy?(EVAL(ast[2], env))
-            true
+            return true
           else
-            false
+            return false
           end
         when :and
           if truthy?(EVAL(ast[1], env)) && truthy?(EVAL(ast[2], env))
-            true
+            return true
           else
-            false
+            return false
           end
         when :"fn*"
           # Function definition.
@@ -99,23 +102,47 @@ def EVAL(ast, env)
           # We take advantage of Ruby closures here;
           # we get access to variables like env and ast inside the function
           # we return here.
-          -> (*exprs) do
-            # Create a new environment with variables bound to the function args
-            new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
 
-            # Evaluate the function body in the context of that new environment
-            EVAL(ast[2], new_env)
-          end
+          return {
+            ast: ast[2],
+            params: ast[1],
+            env: env,
+            fn:  -> (*exprs) do
+              # Create a new environment with variables bound to the function args
+              new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
+
+              # Evaluate the function body in the context of that new environment
+              EVAL(ast[2], new_env)
+            end
+          }
         else
           # Finally, handle generic function application
           evaluated = eval_ast(ast, env)
           function, *args = evaluated
-          function.call(*args)
+
+          if function.is_a? Proc
+            return function.call(*args)
+          # Handle user-defined functions in a tail-recursion-friendly way.
+          elsif function.is_a? Hash
+            # Set ast to the function body, to prepare to evaluate it
+            # on our next loop iteration.
+            ast = function[:ast]
+
+            # Replace the env with a new one with variables bound,
+            # we'll use it on our next loop iteration
+            env = Env.new(
+              outer: function[:env],
+              binds: function[:params],
+              exprs: args
+            )
+          else
+            raise UndefinedFunctionError, "#{function} is not a function."
+          end
         end
       end
     else
       # Atoms simply get resolved in the environment
-      eval_ast(ast, env)
+      return eval_ast(ast, env)
     end
   end
 end
