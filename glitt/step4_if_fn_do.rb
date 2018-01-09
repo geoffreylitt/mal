@@ -68,8 +68,8 @@ def EVAL(ast, env)
         # Finally, evaluate the last argument in the new env and return result
         EVAL(ast[2], new_env)
       when :do
-        # resolve all the elements of the list except the last...
-        ast[1..-1].each { |element| eval_ast(element, env) }
+        # evaluate all the elements of the list except the last...
+        ast[1..-2].each { |element| EVAL(element, env) }
 
         # then return the last element, fully evaluated/applied
         EVAL(ast[-1], env)

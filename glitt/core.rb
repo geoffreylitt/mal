@@ -17,6 +17,5 @@ NS = {
   :list => lambda { |*args| args },
   :list? => lambda { |a| a.is_a? Array },
   :empty? => lambda { |a| a.empty? },
-  :count? => lambda { |a| a.count },
+  :count => lambda { |a| a.nil? ? 0 : a.count },
 }
-
