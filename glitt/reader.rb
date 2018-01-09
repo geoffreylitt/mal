@@ -71,7 +71,7 @@ def read_list(reader)
   list
 end
 
-# Given a reader representing an atom, return our
+# Given a reader where the next character represents an atom, return our
 # internal representation of that atom.
 # We use regex matches to decide what data type to assign to the token.
 
@@ -79,23 +79,25 @@ end
 # conditionals with regexes -- feels like this could get too complex with
 # many types to parse
 def read_atom(reader)
-  if !/^\-*[0-9]+$/.match(reader.peek).nil?
-    Integer(reader.next)
-  elsif !/^\"(.*)\"/.match(reader.peek).nil?
+  token = reader.next
+
+  if !/^\-*[0-9]+$/.match(token).nil?
+    Integer(token)
+  elsif !/^\"(.*)\"/.match(token).nil?
     # Quotation marks get removed from the string in our parsing
     # TODO: figure out if this is actually the right thing to do
     string = Regexp.last_match[1]
 
     # Convert escaped characters into their internal un-escaped representation.
     unescape(string)
-  elsif reader.peek == "true"
+  elsif token == "true"
     true
-  elsif reader.peek == "false"
+  elsif token == "false"
     false
-  elsif reader.peek == "nil"
+  elsif token == "nil"
     nil
   else
-    reader.next.to_sym
+    token.to_sym
   end
 end
 
