@@ -49,6 +49,8 @@ def EVAL(ast, env)
       when :"let*"  then SpecialForms.let_star(ast, env)
       when :do      then SpecialForms.do(ast, env)
       when :if      then SpecialForms.if(ast, env)
+      when :or      then SpecialForms.or(ast, env)
+      when :and      then SpecialForms.and(ast, env)
       when :"fn*"   then SpecialForms.fn_star(ast, env)
       else
         # Finally, handle generic function application

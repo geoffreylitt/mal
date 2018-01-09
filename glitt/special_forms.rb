@@ -1,5 +1,9 @@
 module SpecialForms
   class << self
+    def truthy?(boolean)
+      boolean != nil && boolean != false
+    end
+
     # Define a new value in the environment
     # Example usage of def!:
     # (def! a 6) ;=> 6
@@ -30,12 +34,26 @@ module SpecialForms
     end
 
     def if(ast, env)
-      cond_result = EVAL(ast[1], env)
-      # Fuzzy truthiness is born!
-      if cond_result != nil && cond_result != false
+      if truthy?(EVAL(ast[1], env))
         EVAL(ast[2], env)
       else
         ast.length >= 3 ? EVAL(ast[3], env) : nil
+      end
+    end
+
+    def or(ast, env)
+      if truthy?(EVAL(ast[1], env)) || truthy?(EVAL(ast[2], env))
+        true
+      else
+        false
+      end
+    end
+
+    def and(ast, env)
+      if truthy?(EVAL(ast[1], env)) && truthy?(EVAL(ast[2], env))
+        true
+      else
+        false
       end
     end
 
