@@ -38,6 +38,8 @@ end
 # Given an AST, return the evaluated result.
 # This is the heart of the language!
 def EVAL(ast, env)
+  # This is an infinite loop to support tail recursion.
+  # Many of the clauses below return to escape the infinite loop.
   loop do
     # puts "EVAL(#{ast},#{env})"
     if ast.is_a? Array
