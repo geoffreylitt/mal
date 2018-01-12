@@ -74,7 +74,7 @@ def EVAL(ast, env)
         # We take advantage of Ruby closures here;
         # we get access to variables like env and ast inside the function
         # we return here.
-        -> (*exprs) do
+        return -> (*exprs) do
           # Create a new environment with variables bound to the function args
           new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
 
@@ -85,7 +85,7 @@ def EVAL(ast, env)
         # Finally, handle generic function application
         evaluated = eval_ast(ast, env)
         function, *args = evaluated
-        function.call(*args)
+        return function.call(*args)
       end
     end
   else
