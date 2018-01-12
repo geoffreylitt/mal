@@ -109,7 +109,7 @@ end
 # we start our REPL.
 def define_stdlib
   rep("(def! not (fn* (a) (if a false true)))")
-  rep("(def! sum2 (fn* (n acc) (if (= n 0) acc (sum2 (- n 1) (+ n acc)))))")
+  rep("(def! sum-to (fn* (n acc) (if (= n 0) acc (sum-to (- n 1) (+ n acc)))))")
 end
 
 # Our main loop;
