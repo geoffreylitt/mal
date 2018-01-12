@@ -86,14 +86,7 @@ def EVAL(ast, env)
         # return {
         #   ast: ast[2],
         #   params: ast[1],
-        #   env: env,
-        #   fn:  -> (*exprs) do
-        #     # Create a new environment with variables bound to the function args
-        #     new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
-
-        #     # Evaluate the function body in the context of that new environment
-        #     EVAL(ast[2], new_env)
-        #   end
+        #   env: env
         # }
       else
         # Finally, handle generic function application
