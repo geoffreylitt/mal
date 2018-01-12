@@ -32,12 +32,17 @@ def eval_ast(ast, env)
 end
 
 def READ(str)
+
   read_str(str)
 end
 
 # Given an AST, return the evaluated result.
 # This is the heart of the language!
 def EVAL(ast, env)
+  print "." * caller.size
+  print caller.size
+  print "\n"
+
   # This is an infinite loop to support tail recursion.
   # Many of the clauses below return to escape the infinite loop.
   loop do
@@ -105,18 +110,26 @@ def EVAL(ast, env)
           # we get access to variables like env and ast inside the function
           # we return here.
 
-          return {
-            ast: ast[2],
-            params: ast[1],
-            env: env,
-            fn:  -> (*exprs) do
-              # Create a new environment with variables bound to the function args
-              new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
+          # return {
+          #   ast: ast[2],
+          #   params: ast[1],
+          #   env: env,
+          #   fn:  -> (*exprs) do
+          #     # Create a new environment with variables bound to the function args
+          #     new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
 
-              # Evaluate the function body in the context of that new environment
-              EVAL(ast[2], new_env)
-            end
-          }
+          #     # Evaluate the function body in the context of that new environment
+          #     EVAL(ast[2], new_env)
+          #   end
+          # }
+
+          return -> (*exprs) do
+            # Create a new environment with variables bound to the function args
+            new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
+
+            # Evaluate the function body in the context of that new environment
+            EVAL(ast[2], new_env)
+          end
         else
           # Finally, handle generic function application
           evaluated = eval_ast(ast, env)
@@ -164,6 +177,7 @@ end
 # we start our REPL.
 def define_stdlib
   rep("(def! not (fn* (a) (if a false true)))")
+  rep("(def! sum2 (fn* (n acc) (if (= n 0) acc (sum2 (- n 1) (+ n acc)))))")
 end
 
 # Our main loop;
