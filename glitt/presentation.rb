@@ -99,6 +99,10 @@ def EVAL(ast, env)
         # Finally, handle generic function application
         evaluated = eval_ast(ast, env)
         function, *args = evaluated
+
+        # --------------------------
+        # Non Tail call friendly version
+        # --------------------------
         return function.call(*args)
 
         # --------------------------
