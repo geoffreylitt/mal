@@ -50,8 +50,8 @@ def EVAL(ast, env)
 
       case ast.first
 
-      # Conditionals
       when :if
+        # Conditionals
         conditional, true_branch, false_branch = ast[1..3]
 
         if truthy?(EVAL(conditional, env))
@@ -71,9 +71,6 @@ def EVAL(ast, env)
         # Example usage:
         # ( (fn* [a b] (+ a b)) 2 3 ) ;=> 5
 
-        # We take advantage of Ruby closures here;
-        # we get access to variables like env and ast inside the function
-        # we return here.
         return -> (*exprs) do
           # Create a new environment with variables bound to the function args
           new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
@@ -81,11 +78,51 @@ def EVAL(ast, env)
           # Evaluate the function body in the context of that new environment
           EVAL(ast[2], new_env)
         end
+
+        # --------------------------
+        # Tail call friendly version
+        # --------------------------
+
+        # return {
+        #   ast: ast[2],
+        #   params: ast[1],
+        #   env: env,
+        #   fn:  -> (*exprs) do
+        #     # Create a new environment with variables bound to the function args
+        #     new_env = Env.new(outer: env, binds: ast[1], exprs: exprs)
+
+        #     # Evaluate the function body in the context of that new environment
+        #     EVAL(ast[2], new_env)
+        #   end
+        # }
       else
         # Finally, handle generic function application
         evaluated = eval_ast(ast, env)
         function, *args = evaluated
         return function.call(*args)
+
+        # --------------------------
+        # Tail call friendly version
+        # --------------------------
+
+        # if function.is_a? Proc
+        #   return function.call(*args)
+        # # Handle user-defined functions in a tail-recursion-friendly way.
+        # elsif function.is_a? Hash
+        #   # Set ast to the function body, to prepare to evaluate it
+        #   # on our next loop iteration.
+        #   ast = function[:ast]
+
+        #   # Replace the env with a new one with variables bound,
+        #   # we'll use it on our next loop iteration
+        #   env = Env.new(
+        #     outer: function[:env],
+        #     binds: function[:params],
+        #     exprs: args
+        #   )
+        # else
+        #   raise UndefinedFunctionError, "#{function} is not a function."
+        # end
       end
     end
   else
