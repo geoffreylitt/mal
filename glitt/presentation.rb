@@ -49,17 +49,24 @@ def EVAL(ast, env)
       # First, handle the *Special Forms* --
 
       case ast.first
+
+
+      # Conditionals
+      when :if
+        conditional, true_branch, false_branch = ast[1..3]
+
+        if truthy?(EVAL(conditional, env))
+          EVAL(true_branch, env)
+        else
+          EVAL(false_branch, env)
+        end
+
       when :def!
         # Define a new value in the environment
         # Example usage of def!:
         # (def! a 6) ;=> 6
         env.set(ast[1], EVAL(ast[2], env))
-      when :if
-        if truthy?(EVAL(ast[1], env))
-          EVAL(ast[2], env)
-        else
-          ast.length >= 3 ? EVAL(ast[3], env) : nil
-        end
+
       when :"fn*"
         # Function definition.
         # Example usage:
