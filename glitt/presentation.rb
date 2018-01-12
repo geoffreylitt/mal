@@ -55,9 +55,9 @@ def EVAL(ast, env)
         conditional, true_branch, false_branch = ast[1..3]
 
         if truthy?(EVAL(conditional, env))
-          EVAL(true_branch, env)
+          return EVAL(true_branch, env)
         else
-          EVAL(false_branch, env)
+          return EVAL(false_branch, env)
         end
 
       when :def!
