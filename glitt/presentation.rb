@@ -50,7 +50,6 @@ def EVAL(ast, env)
 
       case ast.first
 
-
       # Conditionals
       when :if
         conditional, true_branch, false_branch = ast[1..3]
@@ -65,7 +64,7 @@ def EVAL(ast, env)
         # Define a new value in the environment
         # Example usage of def!:
         # (def! a 6) ;=> 6
-        env.set(ast[1], EVAL(ast[2], env))
+        return env.set(ast[1], EVAL(ast[2], env))
 
       when :"fn*"
         # Function definition.
@@ -91,7 +90,7 @@ def EVAL(ast, env)
     end
   else
     # Atoms simply get resolved in the environment
-    eval_ast(ast, env)
+    return eval_ast(ast, env)
   end
 end
 
