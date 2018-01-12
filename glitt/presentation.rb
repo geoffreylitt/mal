@@ -82,7 +82,6 @@ def EVAL(ast, env)
         # --------------------------
         # Tail call friendly version
         # --------------------------
-
         # return {
         #   ast: ast[2],
         #   params: ast[1],
