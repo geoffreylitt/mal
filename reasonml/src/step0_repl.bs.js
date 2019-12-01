@@ -2,6 +2,7 @@
 'use strict';
 
 var Readline = require("bs-readline/src/Readline.js");
+var Pervasives = require("bs-platform/lib/js/pervasives.js");
 
 function read(x) {
   return x;
@@ -19,20 +20,20 @@ function rep(input) {
   return input;
 }
 
-function prompt(param) {
-  console.log("user>");
-  return Readline.readline((function (input) {
-                console.log(input);
-                Readline.close(/* () */0);
-                return prompt(/* () */0);
-              }));
+function print_prompt(param) {
+  return Pervasives.print_string("user> ");
 }
 
-prompt(/* () */0);
+Readline.readline((function (input) {
+        console.log(input);
+        return Pervasives.print_string("user> ");
+      }));
+
+Pervasives.print_string("user> ");
 
 exports.read = read;
 exports.$$eval = $$eval;
 exports.print = print;
 exports.rep = rep;
-exports.prompt = prompt;
+exports.print_prompt = print_prompt;
 /*  Not a pure module */

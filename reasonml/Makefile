@@ -1,10 +1,8 @@
-STEPS = step0_repl.ml
-
-STEP_BINS = $(STEPS:%.ml=%)
+STEPS = step0_repl.re
 
 all:
 	yarn build
 
-$(STEP_BINS): %: %.ml
+$(STEPS): %:
 	yarn build
 

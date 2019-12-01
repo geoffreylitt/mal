@@ -1,0 +1,9 @@
+NOTES
+
+Reading from a string is annoying.
+https://reasonml.chat/t/reading-user-input/1934/6
+
+Readline libraries:
+https://redex.github.io/package/bs-readline
+https://redex.github.io/package/bs-node-readline/
+

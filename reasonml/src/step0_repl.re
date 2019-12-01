@@ -10,13 +10,11 @@ let rep = (input) => {
     -> print
 }
 
-let rec prompt = () => {
-  Js.log("user>");
-  Readline.readline((input) => {
-    Js.log(input);
-    Readline.close();
-    prompt();
-  });
-}
+let print_prompt = () => print_string("user> ");
 
-prompt();
+Readline.readline((input) => {
+  rep(input) -> print_endline;
+  print_prompt();
+});
+
+print_prompt();
