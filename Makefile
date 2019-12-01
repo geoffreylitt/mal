@@ -81,7 +81,7 @@ IMPLS = ada awk bash basic c d chuck clojure coffee common-lisp cpp crystal cs d
 	erlang elisp elixir es6 factor forth fsharp glitt go groovy guile haskell \
 	haxe io java julia js kotlin logo lua make mal ocaml matlab miniMAL \
 	nim objc objpascal perl perl6 php pil plpgsql plsql powershell ps \
-	python r racket rpython ruby rust scala skew swift swift3 tcl ts vb vhdl \
+	python r racket reasonml rpython ruby rust scala skew swift swift3 tcl ts vb vhdl \
 	vimscript
 
 EXTENSION = .mal
@@ -202,6 +202,7 @@ powershell_STEP_TO_PROG =  powershell/$($(1)).ps1
 ps_STEP_TO_PROG =      ps/$($(1)).ps
 python_STEP_TO_PROG =  python/$($(1)).py
 r_STEP_TO_PROG =       r/$($(1)).r
+reasonml_STEP_TO_PROG = reasonml/$($(1)).re
 racket_STEP_TO_PROG =  racket/$($(1)).rkt
 rpython_STEP_TO_PROG = rpython/$($(1))
 ruby_STEP_TO_PROG =    ruby/$($(1)).rb
