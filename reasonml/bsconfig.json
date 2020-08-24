@@ -10,7 +10,7 @@
     "in-source": true
   },
   "suffix": ".bs.js",
-  "bs-dependencies": ["bs-readline"],
+  "bs-dependencies": ["tablecloth-bucklescript", "bs-readline"],
   "warnings": {
     "error" : "+101"
   },

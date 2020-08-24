@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "tablecloth-bucklescript": "^0.0.6"
+  }
+}
