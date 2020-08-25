@@ -1,6 +1,6 @@
 (* todo: we'll make this type real later *)
 type mal_type =
-  | MalString of string
+  | MalSymbol of string
   | MalNumber of int
   | MalList of mal_type list
 
@@ -18,7 +18,7 @@ let tokenizer str =
 let rec read_list reader =
   MalList (List.map (fun _t -> read_form reader) reader.tokens)
 
-and read_atom reader = MalString "hi"
+and read_atom reader = MalSymbol "hi"
 
 and read_form (reader : reader) : mal_type =
   match reader.tokens with
@@ -28,5 +28,13 @@ and read_form (reader : reader) : mal_type =
 
 let read_str str =
   let tokens = tokenizer str in
-  let reader = { tokens = tokenizer str; position = 0 } in
+  let reader = { tokens; position = 0 } in
   read_form reader
+
+(* get the remaining tokens for a reader, based on the position marker *)
+let get_tokens (reader : reader) : string list =
+  Array.to_list
+    (Array.sub
+       (Array.of_list reader.tokens)
+       reader.position
+       (List.length reader.tokens - reader.position))
