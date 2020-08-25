@@ -1,7 +1,7 @@
 (* todo: we'll make this type real later *)
 type mal_type = String of string | Number of int
 
-type reader = { form : mal_type; tokens : string list }
+type reader = { tokens : string list; position : int }
 
 let token_re =
   Str.regexp
@@ -14,4 +14,7 @@ let tokenizer str =
 
 let read_form (reader : reader) : mal_type = String "hi"
 
-let read_str str = read_form { form = String ""; tokens = tokenizer str }
+let read_str str =
+  let tokens = tokenizer str in
+  let reader = { tokens = tokenizer str; position = 0 } in
+  read_form reader
