@@ -1,5 +1,8 @@
 (* todo: we'll make this type real later *)
-type mal_type = String of string | Number of int
+type mal_type =
+  | MalString of string
+  | MalNumber of int
+  | MalList of mal_type list
 
 type reader = { tokens : string list; position : int }
 
@@ -12,7 +15,16 @@ let tokenizer str =
     (function Str.Delim d -> Some d | Str.Text _ -> None)
     (Str.full_split token_re str)
 
-let read_form (reader : reader) : mal_type = String "hi"
+let rec read_list reader =
+  MalList (List.map (fun _t -> read_form reader) reader.tokens)
+
+and read_atom reader = MalString "hi"
+
+and read_form (reader : reader) : mal_type =
+  match reader.tokens with
+  | [] -> raise End_of_file
+  | token :: tokens -> (
+      match token with "(" -> read_list reader | _ -> read_atom reader )
 
 let read_str str =
   let tokens = tokenizer str in
