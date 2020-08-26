@@ -1,8 +1,4 @@
-(* todo: we'll make this type real later *)
-type mal_type =
-  | MalSymbol of string
-  | MalNumber of int
-  | MalList of mal_type list
+open Types
 
 type reader = { form : mal_type; tokens : string list }
 
@@ -29,7 +25,10 @@ let rec read_list list_reader =
       let list_form = list_reader.list_form @ [ reader.form ] in
       read_list { list_form; tokens = reader.tokens }
 
-and read_atom token = MalSymbol "hi"
+and read_atom token =
+  match token.[0] with
+  | '0' .. '9' -> MalNumber (int_of_string token)
+  | _ -> MalSymbol token
 
 and read_form (tokens : string list) : reader =
   match tokens with
@@ -43,4 +42,4 @@ and read_form (tokens : string list) : reader =
 
 let read_str str =
   let tokens = tokenizer str in
-  read_form tokens
+  (read_form tokens).form
