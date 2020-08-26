@@ -1,4 +1,4 @@
-open Types
+open Mal_types
 
 type reader = { form : mal_type; tokens : string list }
 
@@ -10,7 +10,8 @@ let token_re =
 
 let tokenizer str =
   List.filter_map
-    (function Str.Delim d -> Some d | Str.Text _ -> None)
+    (function
+      | Str.Delim "" -> None | Str.Delim d -> Some d | Str.Text _ -> None)
     (Str.full_split token_re str)
 
 let rec read_list list_reader =
