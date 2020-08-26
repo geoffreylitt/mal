@@ -16,7 +16,10 @@ let tokenizer str =
 
 let rec read_list list_reader =
   match list_reader.tokens with
-  | [] -> raise End_of_file
+  | [] ->
+      output_string stderr "expected ')', got EOF\n";
+      flush stderr;
+      raise End_of_file
   | ")" :: tokens -> { list_form = list_reader.list_form; tokens }
   | token :: tokens ->
       (* Recursively read the first form, then recursively keep reading the list.
