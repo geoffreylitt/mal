@@ -7,3 +7,4 @@ let rec pr_str exp : string =
   | MalList exps ->
       String.concat ""
         [ "("; String.concat " " (List.map (fun e -> pr_str e) exps); ")" ]
+  | MalBinaryFn _ -> "<binary fn>"

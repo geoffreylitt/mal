@@ -1,4 +1,4 @@
-STEPS = step0_repl.ml step1_read_print.ml
+STEPS = step0_repl.ml step1_read_print.ml step2_eval.ml
 MODULES = mal_types.ml reader.ml printer.ml
 LIBS = str.cmxa unix.cmxa
 MAL_LIB = mal_lib.cmxa
