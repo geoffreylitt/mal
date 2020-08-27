@@ -21,6 +21,6 @@ let main =
   try
     while true do
       print_string "user> ";
-      print_endline (rep (read_line ()))
+      try print_endline (rep (read_line ())) with End_of_file -> ()
     done
   with End_of_file -> ()
