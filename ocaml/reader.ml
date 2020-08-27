@@ -16,10 +16,7 @@ let tokenizer str =
 
 let rec read_list list_reader =
   match list_reader.tokens with
-  | [] ->
-      output_string stderr "expected ')', got EOF\n";
-      flush stderr;
-      raise End_of_file
+  | [] -> raise (MismatchedDelimiter ")")
   | ")" :: tokens -> { list_form = list_reader.list_form; tokens }
   | token :: tokens ->
       (* Recursively read the first form, then recursively keep reading the list.
@@ -30,9 +27,9 @@ let rec read_list list_reader =
       read_list { list_form; tokens = reader.tokens }
 
 and read_atom token =
-  match token.[0] with
-  | '0' .. '9' -> MalNumber (int_of_string token)
-  | _ -> MalSymbol token
+  let int_re = Str.regexp "^\-?[0-9]+$" in
+  if Str.string_match int_re token 0 then MalNumber (int_of_string token)
+  else MalSymbol token
 
 and read_form (tokens : string list) : reader =
   match tokens with
