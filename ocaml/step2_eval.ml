@@ -57,11 +57,12 @@ let rep str = print (eval (read str) repl_env)
 let print_exn exn =
   let msg =
     match exn with
-    | SymbolNotFound sym -> sym ^ " not found.\n"
-    | MismatchedDelimiter delim -> "expected '" ^ delim ^ "', got EOF\n"
-    | _ -> "unknown exception occurred.\n"
+    | SymbolNotFound sym -> sym ^ " not found."
+    | MismatchedDelimiter delim -> "expected '" ^ delim ^ "', got EOF"
+    | InvalidListHead -> "expected function as first element of list."
+    | _ -> "unknown exception occurred."
   in
-  output_string stderr msg;
+  output_string stderr (msg ^ "\n");
   flush stderr
 
 let main =
@@ -70,8 +71,8 @@ let main =
       print_string "user> ";
       try print_endline (rep (read_line ())) with
       (* These are our internal exceptions which shouldn't crash the repl *)
-      | End_of_file -> ()
       | SymbolNotFound sym -> print_exn (SymbolNotFound sym)
       | MismatchedDelimiter delim -> print_exn (MismatchedDelimiter delim)
+      | InvalidListHead -> print_exn InvalidListHead
     done
   with End_of_file -> ()
