@@ -35,23 +35,33 @@ let print exp : string = Printer.pr_str exp
 
 let read str = Reader.read_str str
 
-let rec eval ast (env : Env.env) =
+(* Top-level eval, including function application *)
+let rec eval ast (env : Env.env) : mal_type * Env.env =
   match ast with
-  | MalList [] -> ast
+  | MalList [] -> (ast, env)
+  (* handle special forms *)
+  | MalList (MalSymbol "def!" :: rest) -> (MalSymbol "hi", env)
+  | MalList (MalSymbol "let*" :: rest) -> (MalSymbol "hi", env)
+  (* normal function application *)
   | MalList list -> (
-      let elist = eval_ast ast env in
+      (* call-by-value: depth-first evaluate, then apply function. shadow env. *)
+      let elist, env = eval_ast ast env in
       match elist with
-      | MalList (MalBinaryFn fn :: args) -> fn args
+      | MalList (MalBinaryFn fn :: args) -> (fn args, env)
       | _ -> raise InvalidListHead )
   | _ -> eval_ast ast env
 
-and eval_ast ast env =
+(* Lower level eval: doesn't do function application for lists *)
+and eval_ast ast env : mal_type * Env.env =
   match ast with
-  | MalSymbol sym -> Env.get sym env
-  | MalList list -> MalList (List.map (fun exp -> eval exp env) list)
-  | _ -> ast
+  | MalSymbol sym -> (Env.get sym env, env)
+  | MalList list ->
+      (MalList (List.map (fun exp -> fst (eval exp env)) list), env)
+  | _ -> (ast, env)
 
-let rep str = print (eval (read str) repl_env)
+let rep str =
+  let exp, _env = eval (read str) repl_env in
+  print exp
 
 let print_exn exn =
   let msg =
