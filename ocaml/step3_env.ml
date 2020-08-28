@@ -17,10 +17,9 @@ let wrap_fn fn =
     (fun args ->
       match args with
       | [ MalNumber n1; MalNumber n2 ] -> MalNumber (fn n1 n2)
-      | _ -> raise InvalidArgumentTypes)
+      | _ -> raise (InvalidArguments "function expects numbers"))
 
-(* Fold over a list of built-in functions to create a repl env *)
-let repl_env : Env.env =
+let builtin_env =
   List.fold_left
     (fun env (sym, value) -> Env.set sym value env)
     (Env.empty None)
@@ -31,17 +30,53 @@ let repl_env : Env.env =
       ("/", wrap_fn ( / ));
     ]
 
+(* Fold over a list of built-in functions to create a repl env *)
+let repl_env = ref builtin_env
+
 let print exp : string = Printer.pr_str exp
 
 let read str = Reader.read_str str
+
+let rec group_pairs list =
+  match list with
+  | fst :: snd :: rest -> (fst, snd) :: group_pairs rest
+  | [] -> []
+  | _ -> raise (InvalidArguments "let* expects even list length")
 
 (* Top-level eval, including function application *)
 let rec eval ast (env : Env.env) : mal_type * Env.env =
   match ast with
   | MalList [] -> (ast, env)
-  (* handle special forms *)
-  | MalList (MalSymbol "def!" :: rest) -> (MalSymbol "hi", env)
-  | MalList (MalSymbol "let*" :: rest) -> (MalSymbol "hi", env)
+  (* def!: evaluate the argument, and register in the environment *)
+  | MalList (MalSymbol "def!" :: args) -> (
+      match args with
+      | [ MalSymbol name; exp ] ->
+          let value, env = eval exp env in
+          (* todo: instead of returning result here, could return None, and
+             explicitly represent side-effecting forms in the repl that way *)
+          (value, Env.set name value env)
+      | _ -> raise (InvalidArguments "def! expects name and expression") )
+  (* let*: create a new environment inside current one, register list of bindings,
+           and then evaluate exp inside that environment. *)
+  | MalList (MalSymbol "let*" :: args) -> (
+      match args with
+      | [ MalList bindings; exp ] ->
+          let new_env =
+            List.fold_left
+              (fun env pair ->
+                match pair with
+                | MalSymbol sym, value -> Env.set sym value env
+                | _ ->
+                    raise
+                      (InvalidArguments "let* expects pairs of symbol, value"))
+              (Env.empty (Some env)) (group_pairs bindings)
+          in
+          let result, _ = eval exp new_env in
+          (* IMPORTANT: we don't return the new env, it's local to the let *)
+          (result, env)
+      | _ ->
+          raise
+            (InvalidArguments "let* expects list of bindings and expression") )
   (* normal function application *)
   | MalList list -> (
       (* call-by-value: depth-first evaluate, then apply function. shadow env. *)
@@ -60,7 +95,9 @@ and eval_ast ast env : mal_type * Env.env =
   | _ -> (ast, env)
 
 let rep str =
-  let exp, _env = eval (read str) repl_env in
+  let exp, env = eval (read str) !repl_env in
+  (* update our repl_env to point to the new env after eval *)
+  repl_env := env;
   print exp
 
 let print_exn exn =

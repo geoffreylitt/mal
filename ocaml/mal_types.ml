@@ -8,6 +8,6 @@ exception SymbolNotFound of string
 
 exception MismatchedDelimiter of string
 
-exception InvalidArgumentTypes
+exception InvalidArguments of string
 
 exception InvalidListHead

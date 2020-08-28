@@ -19,7 +19,7 @@ let wrap_fn fn =
     (fun args ->
       match args with
       | [ MalNumber n1; MalNumber n2 ] -> MalNumber (fn n1 n2)
-      | _ -> raise InvalidArgumentTypes)
+      | _ -> raise (InvalidArguments "function expects numbers"))
 
 (* An assoc list should be plenty efficient for small environments;
    easier to program in OCaml than a map. *)
