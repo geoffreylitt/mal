@@ -65,7 +65,9 @@ let rec eval ast (env : Env.env) : mal_type * Env.env =
             List.fold_left
               (fun env pair ->
                 match pair with
-                | MalSymbol sym, value -> Env.set sym value env
+                | MalSymbol sym, exp ->
+                    let value, env = eval exp env in
+                    Env.set sym value env
                 | _ ->
                     raise
                       (InvalidArguments "let* expects pairs of symbol, value"))
@@ -120,5 +122,10 @@ let main =
       | SymbolNotFound sym -> print_exn (SymbolNotFound sym)
       | MismatchedDelimiter delim -> print_exn (MismatchedDelimiter delim)
       | InvalidListHead -> print_exn InvalidListHead
+      (* This case catches unexpected bugs in the interpreter.
+         We catch these exceptions to make mal tests run more smoothly --
+         this way, failed tests of deferred functionality don't blow things up.
+         But later on might want to remove this case and let the interpreter crash? *)
+      | e -> print_exn e
     done
   with End_of_file -> ()
