@@ -37,6 +37,8 @@ let print exp : string = Printer.pr_str exp
 
 let read str = Reader.read_str str
 
+(* group a list into pairs.
+[1; 2; 3; 4] -> [(1, 2); (3, 4)] *)
 let rec group_pairs list =
   match list with
   | fst :: snd :: rest -> (fst, snd) :: group_pairs rest
